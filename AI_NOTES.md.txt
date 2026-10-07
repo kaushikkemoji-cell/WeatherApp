@@ -1,0 +1,62 @@
+# AI Usage Notes
+
+## 1. AI tools used
+
+- **Claude (Anthropic)**, used as a pair programmer through the Claude app: planning the solution,
+  generating code step by step, and diagnosing build and runtime errors from screenshots.
+- [EDIT: add GitHub Copilot / ChatGPT here only if you actually used them.]
+
+## 2. Prompts that helped the most
+
+1. **"I need help with this coding exercise, let's do it one by one, but before that give me an
+   overview of how we get it done."**
+   Asking for a plan before any code gave me the architecture, a step list that mapped to commits,
+   and the key design decisions (exact-format date parsing, per-date status instead of failing the
+   whole request, caching only successful results). It made the rest of the work incremental and
+   reviewable.
+
+2. **"Can we do it with limited use of the terminal?"**
+   This changed the workflow to Visual Studio project templates, Test Explorer, and the built-in
+   Git tools, with the CLI used only where Angular needs it.
+
+3. **Pasting build output directly, e.g. a screenshot of `TS2306: File '.../weather-api.service.ts'
+   is not a module`.**
+   Sharing the exact error, instead of describing it, got a precise diagnosis: the file existed but
+   was empty because it hadn't been saved.
+
+## 3. Where the AI was wrong or not ideal, and how I corrected it
+
+**Example 1: the Visual Studio "Angular and ASP.NET Core" template.**
+The AI recommended this template as the lowest-terminal way to create both projects at once.
+In practice, Visual Studio failed with *"Version of Angular CLI was not valid"* when it ran
+`ng version`. I detected it from the error dialog. Rather than spending time debugging Visual
+Studio's Angular CLI integration, I dropped the template: I created the backend with the plain
+ASP.NET Core Web API template and generated the Angular app separately with
+`npx @angular/cli@19 new`, adding a dev-server proxy. The result is also a cleaner structure with
+the API and UI clearly separated.
+
+**Example 2: a Git command that assumed my environment.**
+To fix a case-only rename (`Dates.txt` → `dates.txt`), which Git on Windows doesn't detect, the AI
+suggested `git mv -f`. The command failed with *"git is not recognized"*, because Git wasn't on my
+PATH (Visual Studio uses its own bundled Git). I corrected it with a two-step rename in Solution
+Explorer (`dates.txt` → `dates-temp.txt` → `dates.txt`) and used **Amend** so the history shows
+a single clean commit. I then verified the lowercase name on GitHub.
+
+**Example 3: code the AI could not compile itself.**
+The AI's environment had no .NET SDK, so none of the C# it produced had been compiled before I
+received it. I treated every step as unverified until I had built it and run the full test suite
+locally (32 tests) and checked the endpoint in Swagger, before committing.
+
+## 4. What I did myself rather than relying on AI
+
+- **Verification:** built and ran the tests after every step, checked `GET /api/weather` in Swagger,
+  confirmed the second call was served from the cache (`fromCache: true`), and confirmed the JSON
+  files were created in `weather-data/` and ignored by Git.
+- **Testing the failure paths by hand:** stopped the API while the UI was open to confirm the
+  error banner and "Try again" flow, and confirmed `April 31, 2022` appears as an invalid date.
+- **Technology choices:** picked Angular over React to match the team's stack (Angular 19).
+- **Debugging the local setup:** the proxy not taking effect (the dev server had started before
+  `proxy.conf.json` was saved, so it needed a restart), and a port conflict from a second
+  `npm start`.
+- **Reviewing every file before committing** and structuring the work into small commits per step.
+- [EDIT: add any code you wrote or changed yourself, or any AI suggestion you rejected. Be specific.]
