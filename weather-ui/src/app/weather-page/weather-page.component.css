@@ -1,0 +1,118 @@
+.page {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: #1f2933;
+}
+
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+}
+
+.subtitle {
+  margin: 0.25rem 0 0;
+  color: #616e7c;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: 1px solid #3e4c59;
+  border-radius: 6px;
+  background: #fff;
+  cursor: pointer;
+  font: inherit;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.status {
+  padding: 2rem;
+  text-align: center;
+  color: #616e7c;
+}
+
+.error-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #e12d39;
+  border-radius: 8px;
+  background: #ffe3e3;
+  color: #8a041a;
+}
+
+.error-banner p {
+  margin: 0.25rem 0 0;
+}
+
+.weather-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.weather-table th,
+.weather-table td {
+  padding: 0.65rem 0.75rem;
+  border-bottom: 1px solid #e4e7eb;
+  text-align: left;
+  vertical-align: top;
+}
+
+.weather-table th {
+  background: #f5f7fa;
+  font-weight: 600;
+}
+
+.num {
+  text-align: right !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.row-problem td {
+  background: #fffbea;
+}
+
+.badge {
+  display: inline-block;
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.badge-ok {
+  background: #e3f9e5;
+  color: #05400a;
+}
+
+.badge-problem {
+  background: #ffe3e3;
+  color: #8a041a;
+}
+
+.cache-tag {
+  margin-left: 0.4rem;
+  font-size: 0.75rem;
+  color: #7b8794;
+}
+
+.row-error {
+  margin-top: 0.25rem;
+  font-size: 0.85rem;
+  color: #8a041a;
+}

@@ -1,0 +1,58 @@
+<main class="page">
+  <header class="page-header">
+    <div>
+      <h1>Historical Weather</h1>
+      @if (report(); as r) {
+        <p class="subtitle">{{ r.location }} · Data from Open-Meteo</p>
+      }
+    </div>
+    <button type="button" (click)="load()" [disabled]="loading()">Refresh</button>
+  </header>
+
+  @if (loading()) {
+    <p class="status" role="status">Loading weather data…</p>
+  } @else if (error()) {
+    <div class="error-banner" role="alert">
+      <div>
+        <strong>Could not load weather data.</strong>
+        <p>{{ error() }}</p>
+      </div>
+      <button type="button" (click)="load()">Try again</button>
+    </div>
+  } @else if (entries().length === 0) {
+    <p class="status">No dates were found in dates.txt.</p>
+  } @else {
+    <table class="weather-table">
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col" class="num">Min temp</th>
+          <th scope="col" class="num">Max temp</th>
+          <th scope="col" class="num">Precipitation</th>
+          <th scope="col">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (entry of entries(); track $index) {
+          <tr [class.row-problem]="entry.status !== 'Ok'">
+            <td>{{ entry.date ?? entry.input }}</td>
+            <td class="num">{{ formatValue(entry.minTemperature, entry.temperatureUnit) }}</td>
+            <td class="num">{{ formatValue(entry.maxTemperature, entry.temperatureUnit) }}</td>
+            <td class="num">{{ formatValue(entry.precipitation, entry.precipitationUnit, 2) }}</td>
+            <td>
+              @if (entry.status === 'Ok') {
+                <span class="badge badge-ok">OK</span>
+                @if (entry.fromCache) {
+                  <span class="cache-tag">cached</span>
+                }
+              } @else {
+                <span class="badge badge-problem">{{ statusLabels[entry.status] }}</span>
+                <div class="row-error">{{ entry.error }}</div>
+              }
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  }
+</main>
