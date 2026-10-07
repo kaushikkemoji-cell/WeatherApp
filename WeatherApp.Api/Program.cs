@@ -16,6 +16,20 @@ builder.Services.AddOptions<OpenMeteoOptions>()
 
 builder.Services.AddSingleton<IDateParser, DateParser>();
 
+builder.Services.AddOptions<StorageOptions>()
+    .Bind(builder.Configuration.GetSection(StorageOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+// Relative paths resolve against the content root (the API project folder when run from VS).
+builder.Services.AddSingleton<IWeatherCache>(sp =>
+{
+    var storage = sp.GetRequiredService<IOptions<StorageOptions>>().Value;
+    var environment = sp.GetRequiredService<IHostEnvironment>();
+    var directory = Path.Combine(environment.ContentRootPath, storage.CacheDirectory);
+    return new FileWeatherCache(directory, sp.GetRequiredService<ILogger<FileWeatherCache>>());
+});
+
 // Typed client via IHttpClientFactory: pooled handlers avoid socket exhaustion and stale DNS.
 builder.Services.AddHttpClient<IOpenMeteoClient, OpenMeteoClient>((sp, http) =>
 {
