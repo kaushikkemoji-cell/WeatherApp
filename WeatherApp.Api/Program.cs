@@ -1,15 +1,31 @@
+using Microsoft.Extensions.Options;
+using WeatherApp.Api.Configuration;
+using WeatherApp.Api.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+// Bind and validate settings at startup so bad config fails fast, not on the first request.
+builder.Services.AddOptions<OpenMeteoOptions>()
+    .Bind(builder.Configuration.GetSection(OpenMeteoOptions.SectionName))
+    .ValidateDataAnnotations()
+    .ValidateOnStart();
+
+builder.Services.AddSingleton<IDateParser, DateParser>();
+
+// Typed client via IHttpClientFactory: pooled handlers avoid socket exhaustion and stale DNS.
+builder.Services.AddHttpClient<IOpenMeteoClient, OpenMeteoClient>((sp, http) =>
+{
+    var options = sp.GetRequiredService<IOptions<OpenMeteoOptions>>().Value;
+    http.BaseAddress = new Uri(options.BaseUrl);
+    http.Timeout = TimeSpan.FromSeconds(options.TimeoutSeconds);
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -17,9 +33,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
-
 app.MapControllers();
 
 app.Run();
