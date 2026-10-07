@@ -22,19 +22,60 @@
   } @else if (entries().length === 0) {
     <p class="status">No dates were found in dates.txt.</p>
   } @else {
+    <div class="toolbar">
+      <label class="filter">
+        Min temperature at least
+        <input
+          type="number"
+          step="1"
+          placeholder="e.g. 60"
+          [value]="minTempFilter() ?? ''"
+          (input)="onMinTempInput($event)"
+        />
+      </label>
+      @if (minTempFilter() !== null) {
+        <button type="button" class="link-button" (click)="clearFilter()">Clear filter</button>
+      }
+      <span class="count">Showing {{ visibleEntries().length }} of {{ entries().length }} dates</span>
+    </div>
+
     <table class="weather-table">
       <thead>
         <tr>
-          <th scope="col">Date</th>
-          <th scope="col" class="num">Min temp</th>
-          <th scope="col" class="num">Max temp</th>
-          <th scope="col" class="num">Precipitation</th>
+          <th scope="col" [attr.aria-sort]="ariaSort('date')">
+            <button type="button" class="sort-button" (click)="sortBy('date')">
+              Date <span class="sort-indicator">{{ sortIndicator('date') }}</span>
+            </button>
+          </th>
+          <th scope="col" class="num" [attr.aria-sort]="ariaSort('minTemperature')">
+            <button type="button" class="sort-button" (click)="sortBy('minTemperature')">
+              Min temp <span class="sort-indicator">{{ sortIndicator('minTemperature') }}</span>
+            </button>
+          </th>
+          <th scope="col" class="num" [attr.aria-sort]="ariaSort('maxTemperature')">
+            <button type="button" class="sort-button" (click)="sortBy('maxTemperature')">
+              Max temp <span class="sort-indicator">{{ sortIndicator('maxTemperature') }}</span>
+            </button>
+          </th>
+          <th scope="col" class="num" [attr.aria-sort]="ariaSort('precipitation')">
+            <button type="button" class="sort-button" (click)="sortBy('precipitation')">
+              Precipitation <span class="sort-indicator">{{ sortIndicator('precipitation') }}</span>
+            </button>
+          </th>
           <th scope="col">Status</th>
         </tr>
       </thead>
       <tbody>
-        @for (entry of entries(); track $index) {
-          <tr [class.row-problem]="entry.status !== 'Ok'">
+        @for (entry of visibleEntries(); track $index) {
+          <tr
+            class="clickable"
+            tabindex="0"
+            [class.row-problem]="entry.status !== 'Ok'"
+            [class.row-selected]="selectedEntry() === entry"
+            [attr.aria-expanded]="selectedEntry() === entry"
+            (click)="toggleDetails(entry)"
+            (keydown.enter)="toggleDetails(entry)"
+          >
             <td>{{ entry.date ?? entry.input }}</td>
             <td class="num">{{ formatValue(entry.minTemperature, entry.temperatureUnit) }}</td>
             <td class="num">{{ formatValue(entry.maxTemperature, entry.temperatureUnit) }}</td>
@@ -47,12 +88,56 @@
                 }
               } @else {
                 <span class="badge badge-problem">{{ statusLabels[entry.status] }}</span>
-                <div class="row-error">{{ entry.error }}</div>
               }
             </td>
+          </tr>
+        } @empty {
+          <tr>
+            <td colspan="5" class="status">No dates match the current filter.</td>
           </tr>
         }
       </tbody>
     </table>
+
+    <p class="hint">Click a column header to sort. Click a row for details.</p>
+
+    @if (selectedEntry(); as entry) {
+      <section class="details" aria-live="polite">
+        <header class="details-header">
+          <h2>{{ entry.date ?? entry.input }}</h2>
+          <button type="button" class="link-button" (click)="selectedEntry.set(null)">Close</button>
+        </header>
+        <dl>
+          <dt>Input from dates.txt</dt>
+          <dd><code>{{ entry.input }}</code></dd>
+
+          <dt>Normalized date</dt>
+          <dd>{{ entry.date ?? '—' }}</dd>
+
+          <dt>Status</dt>
+          <dd>{{ statusLabels[entry.status] }}</dd>
+
+          @if (entry.status === 'Ok') {
+            <dt>Min / Max</dt>
+            <dd>
+              {{ formatValue(entry.minTemperature, entry.temperatureUnit) }} /
+              {{ formatValue(entry.maxTemperature, entry.temperatureUnit) }}
+            </dd>
+
+            <dt>Daily range</dt>
+            <dd>{{ temperatureRange(entry) }}</dd>
+
+            <dt>Precipitation</dt>
+            <dd>{{ formatValue(entry.precipitation, entry.precipitationUnit, 2) }}</dd>
+
+            <dt>Source</dt>
+            <dd>{{ entry.fromCache ? 'Local cache (weather-data folder)' : 'Open-Meteo API (now cached)' }}</dd>
+          } @else {
+            <dt>Error</dt>
+            <dd class="row-error">{{ entry.error }}</dd>
+          }
+        </dl>
+      </section>
+    }
   }
 </main>

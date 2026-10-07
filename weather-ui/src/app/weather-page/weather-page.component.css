@@ -116,3 +116,114 @@ button:disabled {
   font-size: 0.85rem;
   color: #8a041a;
 }
+/* ---- Toolbar / filter ---- */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.filter {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter input {
+  width: 6rem;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #9aa5b1;
+  border-radius: 6px;
+  font: inherit;
+}
+
+.count {
+  margin-left: auto;
+  color: #616e7c;
+  font-size: 0.9rem;
+}
+
+.link-button {
+  padding: 0;
+  border: none;
+  background: none;
+  color: #2563eb;
+  text-decoration: underline;
+}
+
+/* ---- Sortable headers ---- */
+.sort-button {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: inherit;
+}
+
+.sort-indicator {
+  display: inline-block;
+  min-width: 0.8em;
+  font-size: 0.7rem;
+}
+
+/* ---- Clickable rows ---- */
+.clickable {
+  cursor: pointer;
+}
+
+.clickable:hover td {
+  background: #f0f4f8;
+}
+
+.clickable:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: -2px;
+}
+
+.row-selected td {
+  background: #e6f0ff !important;
+}
+
+.hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: #7b8794;
+}
+
+/* ---- Details panel ---- */
+.details {
+  margin-top: 1.5rem;
+  padding: 1rem 1.25rem;
+  border: 1px solid #cbd2d9;
+  border-radius: 8px;
+  background: #fafbfc;
+}
+
+.details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.details h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.details dl {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 0.4rem 1.5rem;
+  margin: 1rem 0 0;
+}
+
+.details dt {
+  color: #616e7c;
+}
+
+.details dd {
+  margin: 0;
+}
